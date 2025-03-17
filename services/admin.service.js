@@ -8,7 +8,7 @@ export class AdminService {
     this.userService = userService;
     this.companyService = companyService;
   }
-  async registerAdmin(adminDto) {
+  async register(adminDto) {
     try {
       const { company_name, password } = adminDto;
       const extCompany = await this.companyService.findByName(company_name);
@@ -29,7 +29,7 @@ export class AdminService {
     }
   }
 
-  async loginAdmin(adminDto) {
+  async login(adminDto) {
     try {
       const { company_name, password } = adminDto;
       const company = await this.companyService.findByName(company_name);

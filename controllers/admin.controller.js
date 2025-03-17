@@ -9,7 +9,7 @@ export class AdminController {
     try {
       const { company_name, password } = req.body;
       const adminDto = new CompanyDTO(company_name, password);
-      const newCompany = await this.adminService.registerAdmin(adminDto);
+      const newCompany = await this.adminService.register(adminDto);
       return res.status(201).json(newCompany);
     } catch (error) {
       return next(error);
@@ -20,7 +20,7 @@ export class AdminController {
     try {
       const { company_name, password } = req.body;
       const adminDto = new CompanyDTO(company_name, password);
-      const admin = await this.adminService.loginAdmin(adminDto);
+      const admin = await this.adminService.login(adminDto);
       return res.status(200).json(admin);
     } catch (error) {
       return next(error);

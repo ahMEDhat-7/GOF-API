@@ -3,36 +3,27 @@ import generateToken from "../utils/generateToken.js";
 import { User } from "./../models/Schema.js";
 import { CustomError } from "../utils/customError.js";
 import STATUS from "../utils/STATUS.js";
-import { UserDTO } from "../dtos/user.dto.js";
+import { CreateUserDto } from "../dtos/user.dto.js";
 
 export class UserService {
   constructor() {}
   /**
    *  create a new user
-   * @param {UserDTO} userDto
+   * @param {CreateUserDto} userDto
    * @returns {JWT} token
    */
   async create(userDto) {
     try {
-      const extUser = await this.findByUsername(userDto.username);
+      const { username, company_id, password, phone_number } = userDto;
 
-      if (extUser) {
-        throw new CustomError("User already exists", 400, STATUS.ERROR);
-      }
-      const password_hash = await bcrypt.hash(password, +process.env.HASH_SALT);
-
-      const newUser = await User.create({
-        company_name,
+      const user = await User.create({
+        company_id,
         username,
         phone_number,
-        password: password_hash,
+        password,
       });
-      const token = generateToken({
-        username,
-        company_name,
-        role_name: "user",
-      });
-      return { token };
+
+      return user;
     } catch (error) {
       throw new CustomError(error.message, 400, STATUS.ERROR);
     }
