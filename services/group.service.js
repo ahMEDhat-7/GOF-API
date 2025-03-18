@@ -54,6 +54,22 @@ export class GroupService {
     }
   }
 
+  async findOwner(id) {
+    try {
+      const group = await Group.findOne({
+        where: {
+          user_id: id,
+        },
+      });
+
+      if (!group) {
+        return new CustomError(null, 404);
+      }
+      return group;
+    } catch (error) {
+      throw new CustomError(error.message, 500, httpStatusText.ERROR);
+    }
+  }
   async findOne(groupData) {
     try {
       const { group_name, created_by_company } = groupData;

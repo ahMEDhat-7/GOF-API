@@ -1,5 +1,5 @@
-import customError from "../utils/customError";
-import httpStatusText from "../utils/STATUS";
+import { CustomError } from "../utils/customError.js";
+import STATUS from "../utils/STATUS.js";
 
 export class RestaurantDTO {
   constructor(restaurant_name, phone_number, img, created_by_company_id) {
@@ -7,7 +7,7 @@ export class RestaurantDTO {
 
     input.forEach((i) => {
       if (typeof i !== "string" && (i === null || i === undefined)) {
-        throw new customError("Invalid Input", 400, httpStatusText.ERROR);
+        throw new CustomError("Invalid Input", 400, STATUS.ERROR);
       }
     });
 

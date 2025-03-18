@@ -4,10 +4,10 @@ import httpStatusText from "../utils/STATUS.js";
 
 export class RestaurantService {
   constructor() {}
-  async create(restaurantData) {
+  async create(restDTO) {
     try {
-      const { restaurant_name, phone_number, img, created_by } = restaurantData;
-      const extRest = await getRestaurant(restaurantData);
+      const { restaurant_name, phone_number, img, company_id } = restDTO;
+      const extRest = await this.findByName(restaurant_name);
 
       if (extRest) {
         throw new CustomError(
@@ -17,13 +17,13 @@ export class RestaurantService {
         );
       }
 
-      const newRest = await Restaurant.create({
+      const Rest = await Restaurant.create({
         restaurant_name,
         phone_number,
         img,
-        created_by,
+        company_id,
       });
-      return newRest;
+      return Rest;
     } catch (error) {
       throw new CustomError(error.message, 400, httpStatusText.ERROR);
     }
@@ -37,7 +37,20 @@ export class RestaurantService {
       throw new CustomError(error.message, 400, httpStatusText.ERROR);
     }
   }
+  async findByName(restaurant_name) {
+    try {
+      const rest = await Restaurant.findOne({
+        where: { restaurant_name },
+      });
 
+      if (!rest) {
+        return null;
+      }
+      return rest;
+    } catch (error) {
+      throw new CustomError(error.message, 400, STATUS.ERROR);
+    }
+  }
   async findOne(restData) {
     try {
       const { restaurant_name } = restData;

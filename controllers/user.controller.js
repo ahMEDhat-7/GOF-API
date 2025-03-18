@@ -9,9 +9,19 @@ export class UserController {
   }
   find = asyncWrapper(async (req, res, next) => {
     try {
-      const userData = req.params;
-      const users = await userService.find(userData);
+      const userData = req["user"];
+      const users = await this.userService.find(userData.id);
       return res.status(200).json(users);
+    } catch (error) {
+      return next(error);
+    }
+  });
+
+  findOne = asyncWrapper(async (req, res, next) => {
+    try {
+      const userData = req["user"];
+      const user = await this.userService.findOne(userData.id);
+      return res.status(200).json(user);
     } catch (error) {
       return next(error);
     }
@@ -23,7 +33,7 @@ export class UserController {
       if (!company) {
         return next(new CustomError("Company not found", 404, STATUS.FAIL));
       }
-      const extUser = await userService.findOne(req.params);
+      const extUser = await this.userService.findOne(req.params);
       if (!extUser) {
         return next(new CustomError("user doesn't exist", 400, STATUS.FAIL));
       }

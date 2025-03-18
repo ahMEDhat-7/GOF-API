@@ -11,7 +11,7 @@ import menuRoute from "./routes/menu.route.js";
 import groupMemberRoute from "./routes/groupMember.route.js";
 import authRoute from "./routes/auth.route.js";
 import adminRoute from "./routes/admin.route.js";
-import { AuthGaurd } from "./middlewares/verifyToken.js";
+import { AuthGaurd } from "./middlewares/Auth.js";
 import { startTask } from "./utils/schedular.js";
 
 const app = express();
@@ -22,12 +22,12 @@ app.use(morgan("combined"));
 app.use(cors());
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
-app.use("/user", AuthGaurd, userRouter);
-app.use("/order", orderRoute);
-app.use("/group", AuthGaurd, groupRoute);
-app.use("/groupMember", AuthGaurd, groupMemberRoute);
-app.use("/restaurant", AuthGaurd, restaurantRoute);
-app.use("/menu", AuthGaurd, menuRoute);
+app.use("/users", AuthGaurd.Auth, userRouter);
+app.use("/orders", AuthGaurd.Auth, orderRoute);
+app.use("/groups", AuthGaurd.Auth, groupRoute);
+app.use("/groupMembers", AuthGaurd, groupMemberRoute);
+app.use("/restaurants", AuthGaurd.Auth, restaurantRoute);
+app.use("/menus", AuthGaurd.Auth, menuRoute);
 app.use("/admin", adminRoute);
 app.use("/auth", authRoute);
 

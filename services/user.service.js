@@ -1,5 +1,3 @@
-import bcrypt from "bcrypt";
-import generateToken from "../utils/generateToken.js";
 import { User } from "./../models/Schema.js";
 import { CustomError } from "../utils/customError.js";
 import STATUS from "../utils/STATUS.js";
@@ -51,52 +49,25 @@ export class UserService {
 
   async findOne(id) {
     try {
-      const extUser = await User.findOne({
+      const user = await User.findOne({
         where: { id },
+        attributes: ["id", "username", "phone_number", "company_id"],
       });
 
-      if (!extUser) {
-        return null;
-      }
-      const isMatch = await bcrypt.compare(password, extUser.password);
+      if (!user) throw new CustomError("user not found", 404, STATUS.FAIL);
 
-      if (!isMatch)
-        throw new CustomError(
-          "Invalid Username or password",
-          400,
-          STATUS.ERROR
-        );
-
-      const token = generateToken({
-        username,
-        company_name: extUser.company_name,
-        role_name: "user",
-      });
-
-      await User.update(
-        { token },
-        {
-          where: {
-            username,
-            company_name: extUser.company_name,
-          },
-        }
-      );
-      return {
-        username: extUser.username,
-        company_name: extUser.company_name,
-        role_name: "user",
-        token,
-      };
+      return user;
     } catch (error) {
       throw new CustomError(error.message, 400, STATUS.ERROR);
     }
   }
 
-  find = async (userData) => {
+  find = async (company_id) => {
     try {
-      const { company_name } = userData;
-      const users = await User.findAll({ where: { company_name } });
+      const users = await User.findAll({
+        where: { company_id },
+        attributes: ["id", "username", "phone_number"],
+      });
       return users;
     } catch (error) {
       return error;

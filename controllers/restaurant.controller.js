@@ -1,6 +1,7 @@
 import asyncWrapper from "../middlewares/asyncWrapper.js";
 import { CustomError } from "../utils/customError.js";
 import STATUS from "../utils/STATUS.js";
+import { RestaurantDTO } from "./../dtos/restaurant.dto.js";
 
 export class RestaurantController {
   constructor(restaurantService) {
@@ -8,8 +9,14 @@ export class RestaurantController {
   }
   create = asyncWrapper(async (req, res, next) => {
     try {
-      const restData = req.body;
-      const newRestaurant = await this.restaurantService.create(restData);
+      const { restaurant_name, phone_number, img, company_id } = req.body;
+      const restDTO = new RestaurantDTO(
+        restaurant_name,
+        phone_number,
+        img,
+        company_id
+      );
+      const newRestaurant = await this.restaurantService.create(restDTO);
       res.status(201).json({
         status: STATUS.SUCCESS,
         data: "Restaurant created .",
