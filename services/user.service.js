@@ -47,6 +47,11 @@ export class UserService {
     }
   }
 
+  /**
+   * Retrive user by id
+   * @param {uuid} id
+   * @returns user
+   */
   async findOne(id) {
     try {
       const user = await User.findOne({
@@ -62,7 +67,12 @@ export class UserService {
     }
   }
 
-  find = async (company_id) => {
+  /**
+   * Retrive all users
+   * @param {uuid} company_id
+   * @returns {User[]} users
+   */
+  async find(company_id) {
     try {
       const users = await User.findAll({
         where: { company_id },
@@ -72,5 +82,5 @@ export class UserService {
     } catch (error) {
       return error;
     }
-  };
+  }
 }

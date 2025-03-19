@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { RestaurantController } from "../controllers/restaurant.controller.js";
 import { RestaurantService } from "./../services/restaurant.service.js";
+import { AuthGaurd } from "./../middlewares/Auth.js";
 
 const router = Router();
 
@@ -9,11 +10,10 @@ const restaurantController = new RestaurantController(new RestaurantService());
 router
   .route("/")
   .get(restaurantController.find)
-  .post(restaurantController.create);
+  .post(AuthGaurd.isAdmin, restaurantController.create);
 router
-  .route("/:restaurant_name")
+  .route("/:id")
   .get(restaurantController.findOne)
-  .patch(restaurantController.update)
-  .delete(restaurantController.remove);
+  .patch(AuthGaurd.isAdmin, restaurantController.update);
 
 export default router;

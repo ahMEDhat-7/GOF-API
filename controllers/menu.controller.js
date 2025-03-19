@@ -1,3 +1,4 @@
+import { CreateMenuDTO } from "../dtos/menu.dto.js";
 import asyncWrapper from "../middlewares/asyncWrapper.js";
 import { CustomError } from "../utils/customError.js";
 import STATUS from "../utils/STATUS.js";
@@ -9,20 +10,29 @@ export class MenuController {
   }
   create = asyncWrapper(async (req, res, next) => {
     try {
-      const menuData = req.body;
-      const newMenu = await this.menuService.create(menuData);
+      const menuItems = req.body;
+      menuItems.map((item) => {
+        item.restaurant_id = req.params.restaurant_id;
+      });
+      console.log(menuItems);
 
-      res.status(201).json(newMenu);
+      const newMenu = await this.menuService.create(menuItems);
+
+      res
+        .status(201)
+        .json({ message: "Menu created.", status: STATUS.SUCCESS });
     } catch (error) {
       next(error);
     }
   });
 
-  findOne = asyncWrapper(async (req, res, next) => {
+  find = asyncWrapper(async (req, res, next) => {
     try {
-      const menuData = req.params;
-      const menu = await this.menuService.findOne(menuData);
-      res.status(200).json(menu);
+      const id = req.params.id;
+      console.log("id", id);
+
+      const menu = await this.menuService.find(id);
+      res.status(200).json("Menu found", menu);
     } catch (error) {
       next(error);
     }

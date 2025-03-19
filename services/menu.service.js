@@ -4,23 +4,52 @@ import httpStatusText from "../utils/STATUS.js";
 
 export class MenuService {
   constructor() {}
-  async create(menuData) {
+  async create(menuDto) {
     try {
-      const { restaurant_name, item_name, options, img } = menuData;
+      const menu = await Menu.bulkCreate(menuDto);
 
-      const newMenu = await Menu.bulkCreate(menuData);
-
-      return newMenu;
+      return menu;
     } catch (error) {
       throw new CustomError(error.message, 400, httpStatusText.ERROR);
     }
   }
 
-  async find(menuData) {
+  async findByName(item_name) {
     try {
-      const { restaurant_name } = menuData;
-      const menu = await Menu.findAll({ where: { restaurant_name } });
+      const menu = await Menu.findOne({ where: { item_name } });
       return menu;
+    } catch (error) {
+      throw new CustomError(error.message, 400, httpStatusText.ERROR);
+    }
+  }
+
+  /**
+   *
+   * @param {uuid} id
+   * @returns {Menu[]} menu items
+   */
+  async find(id) {
+    try {
+      const menu = await Menu.findAll({
+        where: id,
+        attributes: ["id", "item_name", "options", "img"],
+      });
+      return menu;
+    } catch (error) {
+      throw new CustomError(error.message, 400, httpStatusText.ERROR);
+    }
+  }
+
+  async findOne(id) {
+    try {
+      const menus = await Menu.findOne({
+        where: {
+          id,
+        },
+        attributes: ["item_name", "options", "img"],
+      });
+
+      return menus;
     } catch (error) {
       throw new CustomError(error.message, 400, httpStatusText.ERROR);
     }
@@ -42,23 +71,6 @@ export class MenuService {
         return updatedMenu;
       }
       throw new CustomError("Menu item not found", 404, httpStatusText.FAIL);
-    } catch (error) {
-      throw new CustomError(error.message, 400, httpStatusText.ERROR);
-    }
-  }
-
-  async findOne(menuData) {
-    try {
-      const { item_name, restaurant_name } = menuData;
-
-      const menus = await Menu.findOne({
-        where: {
-          item_name,
-          restaurant_name,
-        },
-      });
-
-      return menus;
     } catch (error) {
       throw new CustomError(error.message, 400, httpStatusText.ERROR);
     }
