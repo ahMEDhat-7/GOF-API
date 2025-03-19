@@ -1,6 +1,6 @@
 import { Menu } from "../models/Schema.js";
 import { CustomError } from "../utils/customError.js";
-import httpStatusText from "../utils/STATUS.js";
+import STATUS from "../utils/STATUS.js";
 
 export class MenuService {
   constructor() {}
@@ -10,7 +10,7 @@ export class MenuService {
 
       return menu;
     } catch (error) {
-      throw new CustomError(error.message, 400, httpStatusText.ERROR);
+      throw new CustomError(error.message, 400, STATUS.ERROR);
     }
   }
 
@@ -19,24 +19,24 @@ export class MenuService {
       const menu = await Menu.findOne({ where: { item_name } });
       return menu;
     } catch (error) {
-      throw new CustomError(error.message, 400, httpStatusText.ERROR);
+      throw new CustomError(error.message, 400, STATUS.ERROR);
     }
   }
 
   /**
    *
-   * @param {uuid} id
+   * @param {uuid} restaurant_id
    * @returns {Menu[]} menu items
    */
-  async find(id) {
+  async find(restaurant_id) {
     try {
       const menu = await Menu.findAll({
-        where: id,
+        where: { restaurant_id },
         attributes: ["id", "item_name", "options", "img"],
       });
       return menu;
     } catch (error) {
-      throw new CustomError(error.message, 400, httpStatusText.ERROR);
+      throw new CustomError(error.message, 400, STATUS.ERROR);
     }
   }
 
@@ -51,7 +51,7 @@ export class MenuService {
 
       return menus;
     } catch (error) {
-      throw new CustomError(error.message, 400, httpStatusText.ERROR);
+      throw new CustomError(error.message, 400, STATUS.ERROR);
     }
   }
 
@@ -70,9 +70,9 @@ export class MenuService {
         });
         return updatedMenu;
       }
-      throw new CustomError("Menu item not found", 404, httpStatusText.FAIL);
+      throw new CustomError("Menu item not found", 404, STATUS.FAIL);
     } catch (error) {
-      throw new CustomError(error.message, 400, httpStatusText.ERROR);
+      throw new CustomError(error.message, 400, STATUS.ERROR);
     }
   }
 
@@ -84,9 +84,9 @@ export class MenuService {
       if (deleted) {
         return "Menu item deleted";
       }
-      throw new CustomError("Menu item not found", 404, httpStatusText.FAIL);
+      throw new CustomError("Menu item not found", 404, STATUS.FAIL);
     } catch (error) {
-      throw new CustomError(error.message, 400, httpStatusText.ERROR);
+      throw new CustomError(error.message, 400, STATUS.ERROR);
     }
   }
 }
