@@ -67,16 +67,16 @@ export class RestaurantService {
     try {
       const extRest = await this.findOne(id);
       if (!extRest) {
-        throw new CustomError("Restaurant Not Found", 400, STATUS.ERROR);
+        throw new CustomError("Restaurant Not Found", 404, STATUS.ERROR);
       }
 
       console.log(restData);
 
       const [Rest] = await Restaurant.update(restData, { where: { id } });
       if (Rest > 0) {
-        return { message: "Restaurant updated successfully" };
+        return Rest;
       }
-      throw new CustomError("Nothing updated", 501, STATUS.ERROR);
+      throw new CustomError("Nothing updated", 204, STATUS.ERROR);
     } catch (error) {
       throw new CustomError(error.message, 400, STATUS.ERROR);
     }

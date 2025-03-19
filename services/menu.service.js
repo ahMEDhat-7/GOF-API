@@ -1,9 +1,15 @@
+import { CreateMenuDTO, UpdatedMenuDTO } from "../dtos/menu.dto.js";
 import { Menu } from "../models/Schema.js";
 import { CustomError } from "../utils/customError.js";
 import STATUS from "../utils/STATUS.js";
 
 export class MenuService {
   constructor() {}
+  /**
+   * Create a menu item
+   * @param {CreateMenuDTO} menuDto - menu data transfer object
+   * @returns {Menu} menu item
+   */
   async create(menuDto) {
     try {
       const menu = await Menu.bulkCreate(menuDto);
@@ -14,6 +20,11 @@ export class MenuService {
     }
   }
 
+  /**
+   * Find a menu item by name
+   * @param {string} item_name  - menu item
+   * @returns {Menu} menu item
+   */
   async findByName(item_name) {
     try {
       const menu = await Menu.findOne({ where: { item_name } });
@@ -24,7 +35,7 @@ export class MenuService {
   }
 
   /**
-   *
+   * Find all menu items
    * @param {uuid} restaurant_id
    * @returns {Menu[]} menu items
    */
@@ -40,6 +51,11 @@ export class MenuService {
     }
   }
 
+  /**
+   * Find a menu item by id
+   * @param {uuid} id
+   * @returns {Menu} menu item
+   */
   async findOne(id) {
     try {
       const menus = await Menu.findOne({
@@ -55,34 +71,37 @@ export class MenuService {
     }
   }
 
-  async update(menuData) {
+  /**
+   * Update a menu item by id
+   * @param {uuid} id
+   * @param {UpdatedMenuDTO} menuData
+   * @returns {number} number of rows updated
+   */
+  async update(id, menuData) {
     try {
-      const { restaurant_name, item_name, options, img } = menuData;
-      const [updated] = await Menu.update(
-        { options, img },
-        {
-          where: { restaurant_name, item_name },
-        }
-      );
-      if (updated) {
-        const updatedMenu = await Menu.findOne({
-          where: { restaurant_name, item_name },
-        });
-        return updatedMenu;
-      }
-      throw new CustomError("Menu item not found", 404, STATUS.FAIL);
+      const [updated] = await Menu.update(menuData, {
+        where: { id },
+      });
+      if (updated > 0) return updated;
+
+      throw new CustomError("Nothing updated", 204, STATUS.FAIL);
     } catch (error) {
       throw new CustomError(error.message, 400, STATUS.ERROR);
     }
   }
 
-  async remove(restaurant_name, item_name) {
+  /**
+   * Remove a menu item by id
+   * @param {uuid} id
+   * @returns {number} number of rows deleted
+   */
+  async remove(id) {
     try {
       const deleted = await Menu.destroy({
-        where: { restaurant_name, item_name },
+        where: { id },
       });
-      if (deleted) {
-        return "Menu item deleted";
+      if (deleted > 0) {
+        return deleted;
       }
       throw new CustomError("Menu item not found", 404, STATUS.FAIL);
     } catch (error) {

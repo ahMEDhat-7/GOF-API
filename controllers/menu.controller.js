@@ -1,3 +1,4 @@
+import { UpdatedMenuDTO } from "../dtos/menu.dto.js";
 import asyncWrapper from "../middlewares/asyncWrapper.js";
 import STATUS from "../utils/STATUS.js";
 
@@ -10,7 +11,7 @@ export class MenuController {
     try {
       const menuItems = req.body;
       menuItems.map((item) => {
-        item.restaurant_id = req.params.restaurant_id;
+        item.restaurant_id = req.params.id;
         const rest = this.restaurantService.findOne(item.restaurant_id);
         if (!rest) {
           throw new CustomError("Restaurant Not Found", 404, STATUS.ERROR);
@@ -28,7 +29,7 @@ export class MenuController {
 
   find = asyncWrapper(async (req, res, next) => {
     try {
-      const id = req.params.restaurant_id;
+      const id = req.params.id;
       const rest = await this.restaurantService.findOne(id);
       if (!rest) {
         throw new CustomError("Restaurant Not Found", 404, STATUS.ERROR);
@@ -44,13 +45,13 @@ export class MenuController {
 
   update = asyncWrapper(async (req, res, next) => {
     try {
-      const { restaurantId } = req.params;
-      const updateData = req.body;
-      const menuData = { ...req.body, ...req.params };
-      const updatedMenu = await this.menuService.update(menuData);
+      const { id } = req.params;
+      const { item_name, options, img } = req.body;
+      const menuData = new UpdatedMenuDTO(item_name, options, img);
+      const updatedMenu = await this.menuService.update(id, menuData);
       res.status(200).json({
+        message: "Menu Updated",
         status: STATUS.SUCCESS,
-        data: updatedMenu,
       });
     } catch (error) {
       next(error);
@@ -59,11 +60,11 @@ export class MenuController {
 
   remove = asyncWrapper(async (req, res, next) => {
     try {
-      const { restaurant_name, item_name } = req.params;
-      const message = await this.menuService.remove(restaurant_name, item_name);
+      const { id } = req.params;
+      const deletedItem = await this.menuService.remove(id);
       res.status(200).json({
+        message: "Menu item deleted",
         status: STATUS.SUCCESS,
-        data: message,
       });
     } catch (error) {
       next(error);

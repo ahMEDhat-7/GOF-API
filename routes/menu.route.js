@@ -10,7 +10,7 @@ const menuController = new MenuController(
   new RestaurantService()
 );
 router
-  .route("/:restaurant_id")
+  .route("/:id")
   .get(menuController.find)
   .post(AuthGaurd.isAdmin, menuController.create)
   .patch(AuthGaurd.isAdmin, menuController.update)
