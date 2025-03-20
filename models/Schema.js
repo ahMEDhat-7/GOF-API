@@ -130,6 +130,9 @@ const Group = sequelize.define(
     user_id: {
       type: DataTypes.UUID,
     },
+    company_id: {
+      type: DataTypes.UUID,
+    },
     restaurant_id: {
       type: DataTypes.UUID,
     },

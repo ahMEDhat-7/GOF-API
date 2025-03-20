@@ -43,9 +43,6 @@ export class CompanyService {
   async findOne(id) {
     try {
       const company = await Company.findOne({ where: { id } });
-      if (!company) {
-        return null;
-      }
       return company;
     } catch (error) {
       throw new CustomError(error.message, 400, STATUS.ERROR);

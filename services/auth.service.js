@@ -17,7 +17,11 @@ export class AuthService {
         throw new CustomError("Company Not Found", 400, STATUS.FAIL);
       const extUser = await this.userService.findByUsername(username);
       if (extUser)
-        throw new CustomError("username already exists", 400, STATUS.FAIL);
+        throw new CustomError(
+          "username is taken, Try another",
+          400,
+          STATUS.FAIL
+        );
 
       userDto.password = await getHash(password);
 
@@ -25,6 +29,7 @@ export class AuthService {
 
       const token = generateToken({
         id: user.id,
+        C_id: company_id,
         role: "user",
       });
       return { token };
@@ -47,6 +52,7 @@ export class AuthService {
 
       const token = generateToken({
         id: user.id,
+        C_id: user.company_id,
         role: "user",
       });
 

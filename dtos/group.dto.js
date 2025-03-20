@@ -1,36 +1,26 @@
-import customError from "../utils/customError";
-import httpStatusText from "../utils/STATUS";
+import { CustomError } from "../utils/customError.js";
+import STATUS from "../utils/STATUS.js";
 
-export class GroupDTO {
-  constructor(
-    group_name,
-    created_by,
-    restaurant_id,
-    group_status,
-    duration,
-    created_at,
-    updated_at
-  ) {
-    const input = [
-      group_name,
-      created_by,
-      restaurant_id,
-      group_status,
-      duration,
-      created_at,
-      updated_at,
-    ];
+export class CreateGroupDto {
+  constructor(group_name, user_id, company_id, restaurant_id, duration) {
+    const input = [group_name, user_id, company_id, restaurant_id, duration];
     input.forEach((i) => {
       if (typeof i !== "string" && (i === null || i === undefined)) {
-        throw new customError("Invalid Input", 400, httpStatusText.ERROR);
+        throw new CustomError("Invalid Input", 400, STATUS.ERROR);
       }
     });
     this.group_name = group_name;
-    this.created_by = created_by;
     this.restaurant_id = restaurant_id;
-    this.group_status = group_status;
+    this.user_id = user_id;
+    this.company_id = company_id;
     this.duration = duration;
-    this.created_at = created_at;
-    this.updated_at = updated_at;
+  }
+}
+
+export class UpdatedGroupDto {
+  constructor(group_status) {
+    if (group_status && typeof group_status === "string") {
+      this.item_name = item_name;
+    }
   }
 }

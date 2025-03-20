@@ -12,7 +12,7 @@ const groupController = new GroupController(
 );
 
 router.route("/").post(groupController.create);
-router.route("/:created_by_company/:group_status").get(groupController.find);
+router.route("/:group_status").get(groupController.findByStatus);
 
 router
   .route("/:created_by_company/:group_name")

@@ -39,10 +39,6 @@ export class RestaurantService {
       const rest = await Restaurant.findOne({
         where: { restaurant_name },
       });
-
-      if (!rest) {
-        return null;
-      }
       return rest;
     } catch (error) {
       throw new CustomError(error.message, 400, STATUS.ERROR);

@@ -1,3 +1,4 @@
+import { CreateGroupDto } from "../dtos/group.dto.js";
 import asyncWrapper from "../middlewares/asyncWrapper.js";
 import { CustomError } from "../utils/customError.js";
 import STATUS from "../utils/STATUS.js";
@@ -10,22 +11,39 @@ export class GroupController {
   }
   create = asyncWrapper(async (req, res, next) => {
     try {
-      const groupData = req.body;
-      const newGroup = await this.groupService.create(groupData);
-      const group_name = groupData.group_name;
-      const username = groupData.created_by_username;
-      const company_name = groupData.created_by_company;
+      const { id, C_id } = req["user"];
 
-      // Restaurant id
-
-      const newGM = await this.groupMemberService.create({
+      const { group_name, restaurant_id, duration } = req.body;
+      const groupDto = new CreateGroupDto(
         group_name,
-        username,
-        company_name,
-      });
-      return res.status(201).json(newGroup);
+        id,
+        C_id,
+        restaurant_id,
+        duration
+      );
+
+      const group = await this.groupService.create(groupDto);
+
+      return res.status(201).json({ status: STATUS.SUCCESS, data: group });
     } catch (error) {
       next(new CustomError(error.message, 400, STATUS.FAIL));
+    }
+  });
+
+  findByStatus = asyncWrapper(async (req, res, next) => {
+    try {
+      const { group_status } = req.params;
+      const { C_id } = req["user"];
+      const group = await this.groupService.findByStatus(group_status, C_id);
+      if (!group) {
+        return next(new CustomError("Group not found", 404, STATUS.FAIL));
+      }
+      res.status(200).json({
+        status: STATUS.SUCCESS,
+        data: group,
+      });
+    } catch (error) {
+      return next(error);
     }
   });
 

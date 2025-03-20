@@ -38,9 +38,6 @@ export class UserService {
         where: { username },
       });
 
-      if (!extUser) {
-        return null;
-      }
       return extUser;
     } catch (error) {
       throw new CustomError(error.message, 400, STATUS.ERROR);
@@ -58,8 +55,6 @@ export class UserService {
         where: { id },
         attributes: ["id", "username", "phone_number", "company_id"],
       });
-
-      if (!user) throw new CustomError("user not found", 404, STATUS.FAIL);
 
       return user;
     } catch (error) {

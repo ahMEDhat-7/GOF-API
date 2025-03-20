@@ -1,47 +1,62 @@
 import { Group } from "../models/Schema.js";
 import { Op } from "sequelize";
+import { calculateEndDate } from "../utils/formattedDate.js";
 import { CustomError } from "../utils/customError.js";
-import DataFormate from "../utils/formattedDate.js";
-import httpStatusText from "../utils/STATUS.js";
-
+import STATUS from "../utils/STATUS.js";
 export class GroupService {
-  async create(groupData) {
+  async create(group) {
     try {
-      const existingGroup = await Group.findOne({
+      const userhasGroup = await this.findRunningGroups(group.user_id);
+
+      if (userhasGroup.length === 0) {
+        group.end_date = calculateEndDate(group.duration);
+        const newGroup = await Group.create(group);
+        return newGroup;
+      }
+
+      throw new CustomError(
+        "You have already group hasn't completed yet",
+        400,
+        STATUS.ERROR
+      );
+    } catch (error) {
+      throw new CustomError(error.message, 400, STATUS.ERROR);
+    }
+  }
+
+  async findByStatus(group_status, company_id) {
+    try {
+      console.log(group_status, company_id);
+
+      const groups = await Group.findAll({
         where: {
-          created_by_username: groupData.created_by_username,
-          created_by_company: groupData.created_by_company,
+          group_status,
+          company_id,
+        },
+        attributes: ["id", "group_name", "group_status"],
+      });
+
+      return groups;
+    } catch (error) {
+      throw new CustomError(error.message, 400, STATUS.ERROR);
+    }
+  }
+  async findRunningGroups(id) {
+    try {
+      const groups = await Group.findAll({
+        where: {
+          user_id: id,
           group_status: {
-            [Op.notIn]: ["finished", "cancelled"],
+            [Op.notIn]: ["completed", "cancelled"],
           },
         },
       });
 
-      if (existingGroup) {
-        throw new CustomError(
-          "You have already group hasn't completed yet",
-          400,
-          httpStatusText.ERROR
-        );
-      }
-      const extGroup = await getGroup(groupData);
-
-      if (extGroup.message) {
-        throw new CustomError(
-          "Group already exists",
-          400,
-          httpStatusText.ERROR
-        );
-      }
-      groupData.end_date = DataFormate.formattedDate(groupData.duration);
-      const newGroup = await Group.create(groupData);
-
-      return newGroup;
+      return groups;
     } catch (error) {
-      throw new CustomError(error.message, 400, httpStatusText.ERROR);
+      throw new CustomError(error.message, 400, STATUS.ERROR);
     }
   }
-
   async find(groupData) {
     try {
       const { created_by_company, group_status } = groupData;
@@ -50,7 +65,7 @@ export class GroupService {
       });
       return groups;
     } catch (error) {
-      throw new CustomError(error.message, 400, httpStatusText.ERROR);
+      throw new CustomError(error.message, 400, STATUS.ERROR);
     }
   }
 
@@ -67,7 +82,18 @@ export class GroupService {
       }
       return group;
     } catch (error) {
-      throw new CustomError(error.message, 500, httpStatusText.ERROR);
+      throw new CustomError(error.message, 500, STATUS.ERROR);
+    }
+  }
+  async findByName(group_name) {
+    try {
+      const group = await Group.findOne({
+        where: { group_name },
+      });
+
+      return group;
+    } catch (error) {
+      throw new CustomError(error.message, 400, STATUS.ERROR);
     }
   }
   async findOne(groupData) {
@@ -85,7 +111,7 @@ export class GroupService {
       }
       return group;
     } catch (error) {
-      throw new CustomError(error.message, 500, httpStatusText.ERROR);
+      throw new CustomError(error.message, 500, STATUS.ERROR);
     }
   }
 
@@ -100,12 +126,12 @@ export class GroupService {
       );
 
       if (!updated) {
-        throw new CustomError("Group not found", 404, httpStatusText.FAIL);
+        throw new CustomError("Group not found", 404, STATUS.FAIL);
       }
       const updatedGroup = await getGroup(groupData);
       return updatedGroup;
     } catch (error) {
-      throw new CustomError(error.message, 400, httpStatusText.ERROR);
+      throw new CustomError(error.message, 400, STATUS.ERROR);
     }
   }
 
@@ -116,10 +142,10 @@ export class GroupService {
         where: { group_name, created_by_company },
       });
       if (!deleted) {
-        throw new CustomError("Group not found", 404, httpStatusText.ERROR);
+        throw new CustomError("Group not found", 404, STATUS.ERROR);
       }
     } catch (error) {
-      throw new CustomError(error.message, 400, httpStatusText.ERROR);
+      throw new CustomError(error.message, 400, STATUS.ERROR);
     }
   }
 }
