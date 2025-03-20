@@ -1,4 +1,4 @@
-import { CreateGroupDto } from "../dtos/group.dto.js";
+import { CreateGroupDto, UpdatedGroupDto } from "../dtos/group.dto.js";
 import asyncWrapper from "../middlewares/asyncWrapper.js";
 import { CustomError } from "../utils/customError.js";
 import STATUS from "../utils/STATUS.js";
@@ -65,7 +65,11 @@ export class GroupController {
 
   update = asyncWrapper(async (req, res, next) => {
     try {
-      const groupData = { ...req.body, ...req.params };
+      const groupData = req.body;
+      const updateGroupDto = new UpdatedGroupDto(
+        groupData.group_name,
+        groupData.group_status
+      );
       const group = await this.groupService.findOne(groupData);
 
       if (!group) {

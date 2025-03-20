@@ -15,12 +15,11 @@ import { AuthGaurd } from "./middlewares/Auth.js";
 import { startTask } from "./utils/schedular.js";
 
 const app = express();
-startTask();
+app.use(cors());
 app.use(express.json({ limit: "50mb" })); // Content-Type
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
-app.use(morgan("combined"));
-app.use(cors());
-app.use(express.urlencoded({ extended: true, limit: "50mb" }));
+app.use(morgan("dev"));
+startTask();
 
 app.use("/users", AuthGaurd.Auth, userRouter);
 app.use("/orders", AuthGaurd.Auth, orderRoute);

@@ -11,11 +11,11 @@ const groupController = new GroupController(
   new RestaurantService()
 );
 
-router.route("/").post(groupController.create);
 router.route("/:group_status").get(groupController.findByStatus);
 
 router
-  .route("/:created_by_company/:group_name")
+  .route("/")
+  .post(groupController.create)
   .patch(groupController.update)
   .delete(groupController.remove);
 

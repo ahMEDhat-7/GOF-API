@@ -256,11 +256,12 @@ const Order = sequelize.define(
   {
     id: {
       type: DataTypes.UUID,
-      defaultValue: Sequelize.UUIDV4,
+      defaultValue: DataTypes.UUIDV4, // Automatically generates a UUID
       primaryKey: true,
     },
-    group_member_id: {
+    user_id: {
       type: DataTypes.UUID,
+      allowNull: false,
     },
     menu_item_id: {
       type: DataTypes.UUID,
@@ -276,14 +277,16 @@ const Order = sequelize.define(
     },
     note: {
       type: DataTypes.TEXT,
+      allowNull: true,
     },
     created_at: {
       type: DataTypes.DATE,
-      defaultValue: Sequelize.NOW,
+      defaultValue: DataTypes.NOW,
     },
     updated_at: {
       type: DataTypes.DATE,
-      defaultValue: Sequelize.NOW,
+      defaultValue: DataTypes.NOW,
+      onUpdate: DataTypes.NOW,
     },
   },
   {
@@ -358,12 +361,12 @@ Menu.hasMany(Order, {
 });
 Order.belongsTo(Menu, { foreignKey: "menu_item_id" });
 
-GroupMember.hasMany(Order, {
-  foreignKey: "group_member_id",
+User.hasMany(Order, {
+  foreignKey: "user_id",
   onDelete: "CASCADE",
   onUpdate: "CASCADE",
 });
-Order.belongsTo(GroupMember, { foreignKey: "group_member_id" });
+Order.belongsTo(User, { foreignKey: "user_id" });
 
 export {
   sequelize,

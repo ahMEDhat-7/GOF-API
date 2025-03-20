@@ -1,4 +1,4 @@
-import { Group } from "../models/Schema.js";
+import { Company, Group, User } from "../models/Schema.js";
 import { Op } from "sequelize";
 import { calculateEndDate } from "../utils/formattedDate.js";
 import { CustomError } from "../utils/customError.js";
@@ -26,16 +26,37 @@ export class GroupService {
 
   async findByStatus(group_status, company_id) {
     try {
-      console.log(group_status, company_id);
-
-      const groups = await Group.findAll({
+      let groups = await Group.findAll({
         where: {
           group_status,
           company_id,
         },
-        attributes: ["id", "group_name", "group_status"],
+        include: [
+          {
+            model: User,
+            required: true,
+            attributes: ["username"],
+            include: [
+              {
+                model: Company,
+                where: { id: company_id },
+                required: true,
+                attributes: ["company_name"],
+              },
+            ],
+          },
+        ],
+        attributes: ["group_name", "group_status"],
       });
 
+      groups = groups.map((group) => {
+        return {
+          Name: group.group_name,
+          Status: group.group_status,
+          Owner: group.User.username,
+          BelongsTo: group.User.Company.company_name,
+        };
+      });
       return groups;
     } catch (error) {
       throw new CustomError(error.message, 400, STATUS.ERROR);
@@ -76,10 +97,6 @@ export class GroupService {
           user_id: id,
         },
       });
-
-      if (!group) {
-        return new CustomError(null, 404);
-      }
       return group;
     } catch (error) {
       throw new CustomError(error.message, 500, STATUS.ERROR);
