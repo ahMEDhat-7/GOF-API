@@ -2,7 +2,7 @@ import { Router } from "express";
 import { MenuController } from "../controllers/menu.controller.js";
 import { MenuService } from "../services/menu.service.js";
 import { RestaurantService } from "../services/restaurant.service.js";
-import { AuthGaurd } from "./../middlewares/Auth.js";
+import { Gaurd } from "./../middlewares/Auth.js";
 const router = Router();
 
 const menuController = new MenuController(
@@ -12,8 +12,8 @@ const menuController = new MenuController(
 router
   .route("/:id")
   .get(menuController.find)
-  .post(AuthGaurd.isAdmin, menuController.create)
-  .patch(AuthGaurd.isAdmin, menuController.update)
-  .delete(AuthGaurd.isAdmin, menuController.remove);
+  .post(Gaurd.isAdmin, menuController.create)
+  .patch(Gaurd.isAdmin, menuController.update)
+  .delete(Gaurd.isAdmin, menuController.remove);
 
 export default router;

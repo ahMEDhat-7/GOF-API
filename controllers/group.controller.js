@@ -65,20 +65,19 @@ export class GroupController {
 
   update = asyncWrapper(async (req, res, next) => {
     try {
-      const groupData = req.body;
+      const { group_name, duration, group_status } = req.body;
       const updateGroupDto = new UpdatedGroupDto(
-        groupData.group_name,
-        groupData.group_status
+        group_name,
+        duration,
+        group_status
       );
-      const group = await this.groupService.findOne(groupData);
-
-      if (!group) {
-        throw new CustomError("Group not found", 404, STATUS.FAIL);
-      }
-      const updatedGroup = await this.groupService.update(groupData);
+      const updatedGroup = await this.groupService.update(
+        updateGroupDto,
+        req.params.id
+      );
       res.status(200).json({
+        message: "Group updated",
         status: STATUS.SUCCESS,
-        data: updatedGroup,
       });
     } catch (error) {
       next(error);
@@ -98,19 +97,11 @@ export class GroupController {
 
   remove = asyncWrapper(async (req, res, next) => {
     try {
-      const groupData = req.params;
-      const message = await this.groupService.remove(groupData);
-      res.status(200).json({ status: STATUS.SUCCESS, data: message });
-    } catch (error) {
-      next(error);
-    }
-  });
-
-  updateStatus = asyncWrapper(async (req, res, next) => {
-    try {
-      const groupData = { ...req.params, ...req.body };
-      const updatedGroup = await this.groupService.update(groupData);
-      res.status(200).json(updatedGroup);
+      const { id } = req.params;
+      const message = await this.groupService.remove(id);
+      res
+        .status(200)
+        .json({ status: STATUS.SUCCESS, message: "Group removed" });
     } catch (error) {
       next(error);
     }

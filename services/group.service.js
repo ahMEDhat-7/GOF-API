@@ -92,7 +92,7 @@ export class GroupService {
 
   async findOwner(id) {
     try {
-      const group = await Group.findOne({
+      const group = await Group.findAll({
         where: {
           user_id: id,
         },
@@ -113,54 +113,44 @@ export class GroupService {
       throw new CustomError(error.message, 400, STATUS.ERROR);
     }
   }
-  async findOne(groupData) {
+  async findOne(id) {
     try {
-      const { group_name, created_by_company } = groupData;
       const group = await Group.findOne({
         where: {
-          group_name,
-          created_by_company,
+          id,
         },
       });
 
-      if (!group) {
-        return new CustomError(null, 404);
-      }
       return group;
     } catch (error) {
       throw new CustomError(error.message, 500, STATUS.ERROR);
     }
   }
 
-  async update(groupData) {
+  async update(groupData, id) {
     try {
-      const { group_status, group_name, created_by_company } = groupData;
-      const [updated] = await Group.update(
-        { group_status },
-        {
-          where: { group_name, created_by_company },
-        }
-      );
-
-      if (!updated) {
-        throw new CustomError("Group not found", 404, STATUS.FAIL);
+      const group = await this.findOne(id);
+      if (!group) {
+        throw new CustomError("Group Not Found", 404, STATUS.ERROR);
       }
-      const updatedGroup = await getGroup(groupData);
-      return updatedGroup;
+      const [updated] = await Group.update(groupData, {
+        where: { id },
+      });
+
+      if (updated > 0) return updated;
+      throw new CustomError("Nothing updated", 204, STATUS.ERROR);
     } catch (error) {
       throw new CustomError(error.message, 400, STATUS.ERROR);
     }
   }
 
-  async remove(groupData) {
+  async remove(id) {
     try {
-      const { group_name, created_by_company } = groupData;
       const deleted = await Group.destroy({
-        where: { group_name, created_by_company },
+        where: { id },
       });
-      if (!deleted) {
-        throw new CustomError("Group not found", 404, STATUS.ERROR);
-      }
+      if (deleted > 0) return deleted;
+      throw new CustomError("Cant remove Group", 400, STATUS.ERROR);
     } catch (error) {
       throw new CustomError(error.message, 400, STATUS.ERROR);
     }

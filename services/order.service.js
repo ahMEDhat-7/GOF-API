@@ -23,12 +23,10 @@ export class OrderService {
   }
   async findOwner(id) {
     try {
-      const order = await Order.findOne({
+      const order = await Order.findAll({
         where: { user_id: id },
       });
-      if (!order) {
-        throw new CustomError("order not found", 404, httpStatusText.NOT_FOUND);
-      }
+
       return order;
     } catch (error) {
       throw new CustomError(error.message, 400, httpStatusText.ERROR);

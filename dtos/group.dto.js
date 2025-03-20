@@ -20,7 +20,7 @@ export class CreateGroupDto {
 export class UpdatedGroupDto {
   constructor(group_name, duration, group_status) {
     if (group_status && typeof group_status === "string") {
-      this.item_name = item_name;
+      this.group_status = group_status;
     }
     if (duration && typeof duration === "number") {
       this.duration = duration;

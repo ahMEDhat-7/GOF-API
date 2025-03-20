@@ -4,11 +4,10 @@ import { VerifyToken } from "../utils/generateToken.js";
 import { GroupService } from "../services/group.service.js";
 import { OrderService } from "../services/order.service.js";
 
-export class AuthGaurd {
-  constructor() {
-    this.groupService = new GroupService();
-    this.orderService = new OrderService();
-  }
+const groupService = new GroupService();
+const orderService = new OrderService();
+export class Gaurd {
+  constructor() {}
 
   static Auth = (req, res, next) => {
     const authHeader =
@@ -64,8 +63,11 @@ export class AuthGaurd {
       }
       const token = authHeader.split(" ")[1];
       const payload = VerifyToken(token);
-      const owner = await this.groupService.findOwner(payload.id);
-      if (owner || payload.role === "admin") {
+      const owner = await groupService.findOwner(payload.id);
+      if (
+        owner.find((g) => g.id === req.params.id) ||
+        payload.role === "admin"
+      ) {
         req["user"] = payload;
         next();
       } else {
@@ -83,15 +85,17 @@ export class AuthGaurd {
   };
   static isOrderOwner = async (req, res, next) => {
     try {
-      const { ordered_by_group_name, item_name, option, note } = req.body;
       const authHeader = req.headers.authorization;
       if (!authHeader || !authHeader.startsWith("Bearer ")) {
         return res.status(401).json({ message: "No token provided" });
       }
       const token = authHeader.split(" ")[1];
       const payload = VerifyToken(token);
-      const owner = await this.orderService.findOwner(payload.id);
-      if (owner || payload.role === "admin") {
+      const owner = await orderService.findOwner(payload.id);
+      if (
+        owner.find((o) => o.id === req.params.id) ||
+        payload.role === "admin"
+      ) {
         req["user"] = payload;
         next();
       } else {
@@ -101,12 +105,10 @@ export class AuthGaurd {
       }
     } catch (err) {
       console.error("Error verifying token:", err.message);
-      res
-        .status(401)
-        .json({
-          message: "Unauthorized: Invalid or expired token",
-          status: 401,
-        });
+      res.status(401).json({
+        message: "Unauthorized: Invalid or expired token",
+        status: 401,
+      });
     }
   };
 }

@@ -11,7 +11,7 @@ import menuRoute from "./routes/menu.route.js";
 import groupMemberRoute from "./routes/groupMember.route.js";
 import authRoute from "./routes/auth.route.js";
 import adminRoute from "./routes/admin.route.js";
-import { AuthGaurd } from "./middlewares/Auth.js";
+import { Gaurd } from "./middlewares/Auth.js";
 import { startTask } from "./utils/schedular.js";
 
 const app = express();
@@ -21,12 +21,12 @@ app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use(morgan("dev"));
 startTask();
 
-app.use("/users", AuthGaurd.Auth, userRouter);
-app.use("/orders", AuthGaurd.Auth, orderRoute);
-app.use("/groups", AuthGaurd.Auth, groupRoute);
-app.use("/groupMembers", AuthGaurd, groupMemberRoute);
-app.use("/restaurants", AuthGaurd.Auth, restaurantRoute);
-app.use("/menus", AuthGaurd.Auth, menuRoute);
+app.use("/users", Gaurd.Auth, userRouter);
+app.use("/orders", Gaurd.Auth, orderRoute);
+app.use("/groups", Gaurd.Auth, groupRoute);
+app.use("/groupMembers", Gaurd, groupMemberRoute);
+app.use("/restaurants", Gaurd.Auth, restaurantRoute);
+app.use("/menus", Gaurd.Auth, menuRoute);
 app.use("/admin", adminRoute);
 app.use("/auth", authRoute);
 
