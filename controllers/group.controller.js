@@ -23,6 +23,11 @@ export class GroupController {
       );
 
       const group = await this.groupService.create(groupDto);
+      const groupMember = await this.groupMemberService.create({
+        user_id: id,
+        group_id: group.id,
+        restaurant_id,
+      });
 
       return res.status(201).json({ status: STATUS.SUCCESS, data: group });
     } catch (error) {

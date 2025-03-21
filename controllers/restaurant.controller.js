@@ -16,7 +16,9 @@ export class RestaurantController {
   }
   create = asyncWrapper(async (req, res, next) => {
     try {
-      const { restaurant_name, phone_number, img, company_id } = req.body;
+      const { restaurant_name, phone_number, img } = req.body;
+      const company_id = req["user"].id;
+
       const restDTO = new RestaurantDTO(
         restaurant_name,
         phone_number,

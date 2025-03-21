@@ -12,7 +12,7 @@ const orderController = new OrderController(
   new GroupMemberService()
 );
 
-router.route("/").post(orderController.create);
+router.route("/:id").post(orderController.create);
 router
   .route("/total/:ordered_by_company/:ordered_by_group_name")
   .get(orderController.findTotal);

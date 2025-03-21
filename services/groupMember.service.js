@@ -1,5 +1,6 @@
 import { GroupMember } from "../models/Schema.js";
 import { CustomError } from "../utils/customError.js";
+import STATUS from "../utils/STATUS.js";
 
 export class GroupMemberService {
   constructor() {}
@@ -8,24 +9,20 @@ export class GroupMemberService {
       const newGroupMember = await GroupMember.create(groupMemberData);
       return newGroupMember;
     } catch (error) {
-      throw new CustomError(error.message, 400, httpStatusText.ERROR);
+      throw new CustomError(error.message, 400, STATUS.ERROR);
     }
   }
 
-  async findOne(gmData) {
+  async findOne(user_id) {
     try {
-      const { ordered_by_group_name, ordered_by_company, ordered_by_username } =
-        gmData;
       const groupMember = await GroupMember.findOne({
         where: {
-          group_name: ordered_by_group_name,
-          username: ordered_by_username,
-          company_name: ordered_by_company,
+          user_id,
         },
       });
       return groupMember;
     } catch (error) {
-      throw new CustomError(error.message, 400, httpStatusText.ERROR);
+      throw new CustomError(error.message, 400, STATUS.ERROR);
     }
   }
 
@@ -40,13 +37,9 @@ export class GroupMemberService {
         });
         return updatedGroupMember;
       }
-      throw new CustomError(
-        "Group member not found",
-        404,
-        httpStatusText.ERROR
-      );
+      throw new CustomError("Group member not found", 404, STATUS.ERROR);
     } catch (error) {
-      throw new CustomError(error.message, 400, httpStatusText.ERROR);
+      throw new CustomError(error.message, 400, STATUS.ERROR);
     }
   }
 
@@ -55,7 +48,7 @@ export class GroupMemberService {
       const groupMembers = await GroupMember.findAll();
       return groupMembers;
     } catch (error) {
-      throw new CustomError(error.message, 400, httpStatusText.ERROR);
+      throw new CustomError(error.message, 400, STATUS.ERROR);
     }
   }
 
@@ -67,13 +60,9 @@ export class GroupMemberService {
       if (deleted) {
         return "Group member deleted";
       }
-      throw new CustomError(
-        "Group member not found",
-        404,
-        httpStatusText.ERROR
-      );
+      throw new CustomError("Group member not found", 404, STATUS.ERROR);
     } catch (error) {
-      throw new CustomError(error.message, 400, httpStatusText.ERROR);
+      throw new CustomError(error.message, 400, STATUS.ERROR);
     }
   }
 }

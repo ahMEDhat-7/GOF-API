@@ -5,19 +5,15 @@ export class RestaurantService {
   constructor() {}
   async create(restDTO) {
     try {
-      const { restaurant_name, phone_number, img, company_id } = restDTO;
+      const { restaurant_name } = restDTO;
+
       const extRest = await this.findByName(restaurant_name);
 
       if (extRest) {
         throw new CustomError("Restaurant already exists", 400, STATUS.ERROR);
       }
 
-      const Rest = await Restaurant.create({
-        restaurant_name,
-        phone_number,
-        img,
-        company_id,
-      });
+      const Rest = await Restaurant.create(restDTO);
       return Rest;
     } catch (error) {
       throw new CustomError(error.message, 400, STATUS.ERROR);

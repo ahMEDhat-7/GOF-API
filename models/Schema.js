@@ -185,9 +185,6 @@ const GroupMember = sequelize.define(
     user_id: {
       type: DataTypes.UUID,
     },
-    restaurant_id: {
-      type: DataTypes.UUID,
-    },
     created_at: {
       type: DataTypes.DATE,
       defaultValue: Sequelize.NOW,
@@ -256,7 +253,7 @@ const Order = sequelize.define(
   {
     id: {
       type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4, // Automatically generates a UUID
+      defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
     },
     user_id: {
@@ -270,6 +267,10 @@ const Order = sequelize.define(
     order_status: {
       type: DataTypes.ENUM("pending", "arrived", "completed", "cancelled"),
       defaultValue: "pending",
+    },
+    options: {
+      type: DataTypes.STRING(50),
+      allowNull: false,
     },
     quantity: {
       type: DataTypes.INTEGER,
@@ -339,13 +340,6 @@ User.hasMany(GroupMember, {
   onUpdate: "CASCADE",
 });
 GroupMember.belongsTo(User, { foreignKey: "user_id" });
-
-Restaurant.hasMany(GroupMember, {
-  foreignKey: "restaurant_id",
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
-});
-GroupMember.belongsTo(Restaurant, { foreignKey: "restaurant_id" });
 
 Restaurant.hasMany(Menu, {
   foreignKey: "restaurant_id",

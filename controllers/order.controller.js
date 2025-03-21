@@ -1,3 +1,4 @@
+import { CreateOrderDto } from "../dtos/order.dto.js";
 import asyncWrapper from "../middlewares/asyncWrapper.js";
 import { CustomError } from "../utils/customError.js";
 import STATUS from "../utils/STATUS.js";
@@ -5,31 +6,38 @@ import STATUS from "../utils/STATUS.js";
 export class OrderController {
   constructor(orderService, groupService, groupMemberService) {
     this.orderService = orderService;
+    this.groupService = groupService;
     this.groupMemberService = groupMemberService;
   }
   create = asyncWrapper(async (req, res, next) => {
     try {
-      const orderData = req.body;
-      const GM = await this.groupMemberService.findOne(orderData);
+      const { menu_item_id, options, quantity, note } = req.body;
+      const group_id = req.params.id;
+      const user_id = req["user"].id;
+      const orderData = new CreateOrderDto(
+        user_id,
+        menu_item_id,
+        options,
+        quantity,
+        note
+      );
+      const GM = await this.groupMemberService.findOne(user_id);
 
       if (!GM) {
         await this.groupMemberService.create({
-          group_name: orderData.ordered_by_group_name,
-          username: orderData.ordered_by_username,
-          company_name: orderData.ordered_by_company,
+          user_id,
+          group_id,
         });
       }
 
-      const group = await this.groupService.findOne({
-        group_name: orderData.ordered_by_group_name,
-        created_by_company: orderData.ordered_by_company,
-      });
-      if (!group || group.group_status !== "running") {
+      const group = await this.groupService.findOne(group_id);
+
+      if (group.group_status !== "running") {
         throw new CustomError("The group is not running", 400, STATUS.ERROR);
       }
 
       const newOrder = await this.orderService.create(orderData);
-      res.status(201).json(newOrder);
+      res.status(201).json({ status: STATUS.SUCCESS, data: newOrder });
     } catch (error) {
       next(error);
     }

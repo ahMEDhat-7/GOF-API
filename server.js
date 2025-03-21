@@ -24,7 +24,7 @@ startTask();
 app.use("/users", Gaurd.Auth, userRouter);
 app.use("/orders", Gaurd.Auth, orderRoute);
 app.use("/groups", Gaurd.Auth, groupRoute);
-app.use("/groupMembers", Gaurd, groupMemberRoute);
+app.use("/groupMembers", Gaurd.Auth, groupMemberRoute);
 app.use("/restaurants", Gaurd.Auth, restaurantRoute);
 app.use("/menus", Gaurd.Auth, menuRoute);
 app.use("/admin", adminRoute);

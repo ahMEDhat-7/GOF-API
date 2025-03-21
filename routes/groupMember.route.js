@@ -8,7 +8,10 @@ const groupMemberController = new GroupMemberController(
   new GroupMemberService()
 );
 
-router.route("/").post(groupMemberController.create);
+router
+  .route("/")
+  .post(groupMemberController.create)
+  .get(groupMemberController.find);
 router.route("/:id").get(groupMemberController.findOne);
 
 export default router;

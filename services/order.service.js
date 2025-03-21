@@ -1,7 +1,7 @@
 import { Menu, Order } from "../models/Schema.js";
 import { fn, col, Op } from "sequelize";
 import { CustomError } from "../utils/customError.js";
-import httpStatusText from "../utils/STATUS.js";
+import STATUS from "../utils/STATUS.js";
 
 export class OrderService {
   constructor(menuService) {
@@ -9,16 +9,16 @@ export class OrderService {
   }
   async create(orderData) {
     try {
-      const order = await getOrder(orderData);
+      const order = await this.findOne(orderData);
       if (order) {
-        throw new CustomError("order alredy exists", 400, httpStatusText.ERROR);
+        throw new CustomError("order alredy exists", 400, STATUS.ERROR);
       }
 
       const newOrder = await Order.create(orderData);
 
       return newOrder;
     } catch (error) {
-      throw new CustomError(error.message, 400, httpStatusText.ERROR);
+      throw new CustomError(error.message, 400, STATUS.ERROR);
     }
   }
   async findOwner(id) {
@@ -29,30 +29,23 @@ export class OrderService {
 
       return order;
     } catch (error) {
-      throw new CustomError(error.message, 400, httpStatusText.ERROR);
+      throw new CustomError(error.message, 400, STATUS.ERROR);
     }
   }
   async findOne(orderData) {
     try {
-      const {
-        ordered_by_group_name,
-        ordered_by_username,
-        ordered_by_company,
-        option,
-        note,
-      } = orderData;
+      const { user_id, menu_item_id, options, note } = orderData;
       const order = await Order.findOne({
         where: {
-          ordered_by_group_name,
-          ordered_by_username,
-          ordered_by_company,
-          option,
+          user_id,
+          menu_item_id,
+          options,
           note,
         },
       });
       return order;
     } catch (error) {
-      throw new CustomError(error.message, 400, httpStatusText.ERROR);
+      throw new CustomError(error.message, 400, STATUS.ERROR);
     }
   }
 
@@ -88,7 +81,7 @@ export class OrderService {
       }
       return "orders already updated";
     } catch (error) {
-      throw new CustomError(error.message, 400, httpStatusText.ERROR);
+      throw new CustomError(error.message, 400, STATUS.ERROR);
     }
   }
 
@@ -136,7 +129,7 @@ export class OrderService {
 
       return enrichedOrders;
     } catch (error) {
-      throw new Error(error.message, 400, httpStatusText.ERROR);
+      throw new Error(error.message, 400, STATUS.ERROR);
     }
   }
 
@@ -153,7 +146,7 @@ export class OrderService {
       const order = await getOrder(orderData);
 
       if (!order) {
-        throw new CustomError("Order not found", 404, httpStatusText.FAIL);
+        throw new CustomError("Order not found", 404, STATUS.FAIL);
       }
 
       if (order.order_status === "running") {
@@ -169,9 +162,9 @@ export class OrderService {
         });
         return "delete done";
       }
-      throw new CustomError("Can't delete order", 400, httpStatusText.ERROR);
+      throw new CustomError("Can't delete order", 400, STATUS.ERROR);
     } catch (error) {
-      throw new CustomError(error.message, 400, httpStatusText.ERROR);
+      throw new CustomError(error.message, 400, STATUS.ERROR);
     }
   }
 
@@ -218,7 +211,7 @@ export class OrderService {
 
       return enrichedOrders;
     } catch (error) {
-      throw new CustomError(error.message, 400, httpStatusText.ERROR);
+      throw new CustomError(error.message, 400, STATUS.ERROR);
     }
   }
 
@@ -258,7 +251,7 @@ export class OrderService {
 
       return enrichedOrders;
     } catch (error) {
-      throw new Error(error.message, 400, httpStatusText.ERROR);
+      throw new Error(error.message, 400, STATUS.ERROR);
     }
   }
 
@@ -279,7 +272,7 @@ export class OrderService {
       }
       return "orders already arrived";
     } catch (error) {
-      throw new CustomError(error.message, 400, httpStatusText.ERROR);
+      throw new CustomError(error.message, 400, STATUS.ERROR);
     }
   }
 
@@ -298,7 +291,7 @@ export class OrderService {
       });
       return order;
     } catch (error) {
-      throw new CustomError(error.message, 400, httpStatusText.ERROR);
+      throw new CustomError(error.message, 400, STATUS.ERROR);
     }
   }
 }

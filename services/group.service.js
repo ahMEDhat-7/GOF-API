@@ -46,7 +46,7 @@ export class GroupService {
             ],
           },
         ],
-        attributes: ["group_name", "group_status"],
+        attributes: ["group_name", "group_status", "duration"],
       });
 
       groups = groups.map((group) => {
@@ -55,6 +55,7 @@ export class GroupService {
           Status: group.group_status,
           Owner: group.User.username,
           BelongsTo: group.User.Company.company_name,
+          Duration: group.duration,
         };
       });
       return groups;
