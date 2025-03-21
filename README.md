@@ -1,10 +1,8 @@
-> **Note**: This project is **still under development**. Some features, such as payment integration and Hosting, are coming soon. We appreciate your patience!
-
 # Group Food Ordering
 
 ## Project Overview
 
-**Group Food Ordering** is an innovative platform designed to simplify the process of ordering food for groups. Whether it's for a family gathering, office lunch, or social event, this system allows users to place orders together in a collaborative, efficient, and automated way. It streamlines the decision-making and payment process, making group food ordering easier than ever before.
+**Group Food Ordering Backend** is an innovative platform designed to simplify the process of ordering food for groups. Whether it's for a family gathering, office lunch, or social event, this system allows users to place orders together in a collaborative, efficient, and automated way. It streamlines the decision-making and payment process, making group food ordering easier than ever before.
 
 ---
 
@@ -24,7 +22,6 @@
 - **Database**: MySQL
 - **ORM**: sequelize
 - **Security**: bcrypt , JWT
-- **Hosting**: vercel
 - **Version Control**: Git, GitHub
 
 ---
@@ -48,18 +45,4 @@ To use the Group Food Ordering service, simply follow these steps:
 - Each user can customize their food items (e.g., toppings, sides, or special requests).
 - Review all items in the cart before proceeding to checkout.
 
-### 4. Payment
-
-- Choose your preferred payment method and finalize the payment. You can either pay for the entire group or split the payment among members.
-- The service supports secure online payment options, including credit/debit cards and third-party services like PayPal or Stripe.
-
-### 5. Track the Order
-
-- You will receive real-time updates about the order status, from preparation to delivery.
-- Notifications will be sent when the food is ready and on the way.
-
 ---
-
-## 📜 License
-
-This project is licensed under the **MIT License**.
