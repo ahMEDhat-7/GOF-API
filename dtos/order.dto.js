@@ -2,8 +2,8 @@ import { CustomError } from "../utils/customError.js";
 import STATUS from "../utils/STATUS.js";
 
 export class CreateOrderDto {
-  constructor(user_id, menu_item_id, options, quantity, note) {
-    const input = [user_id, menu_item_id, options];
+  constructor(user_id, group_id, menu_item_id, options, quantity, note) {
+    const input = [user_id, group_id, menu_item_id, options];
     input.forEach((i) => {
       if (typeof i !== "string" && (i === null || i === undefined)) {
         throw new CustomError("Invalid Input", 400, STATUS.ERROR);
@@ -18,6 +18,7 @@ export class CreateOrderDto {
       );
     }
     this.user_id = user_id;
+    this.group_id = group_id;
     this.menu_item_id = menu_item_id;
     this.quantity = quantity;
     this.options = options;

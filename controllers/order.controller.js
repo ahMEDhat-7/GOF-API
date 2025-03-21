@@ -16,6 +16,7 @@ export class OrderController {
       const user_id = req["user"].id;
       const orderData = new CreateOrderDto(
         user_id,
+        group_id,
         menu_item_id,
         options,
         quantity,
@@ -79,8 +80,8 @@ export class OrderController {
 
   find = asyncWrapper(async (req, res, next) => {
     try {
-      const orderData = req.params;
-      const orders = await this.orderService.find(orderData);
+      const user_id = req["user"].id;
+      const orders = await this.orderService.find(user_id);
       res.status(200).json({
         status: STATUS.SUCCESS,
         data: orders,
@@ -102,8 +103,9 @@ export class OrderController {
 
   findTotal = asyncWrapper(async (req, res, next) => {
     try {
-      const orderData = req.params;
-      const orders = await this.orderService.findTotal(orderData);
+      const group_id = req.params.id;
+      const user_id = req["user"].id;
+      const orders = await this.orderService.findTotal(group_id);
       res.status(200).json({
         status: STATUS.SUCCESS,
         data: orders,
@@ -115,7 +117,7 @@ export class OrderController {
 
   findByUser = asyncWrapper(async (req, res, next) => {
     try {
-      const orderData = req.params;
+      const user_id = req["user"].id;
       const orders = await this.orderService.findByUser(orderData);
       res.status(200).json({
         status: STATUS.SUCCESS,
@@ -128,8 +130,8 @@ export class OrderController {
 
   notifyAsArrived = asyncWrapper(async (req, res, next) => {
     try {
-      const orderData = req.params;
-      const updatedOrder = await this.orderService.notifyAsArrived(orderData);
+      const group_id = req.params.id;
+      const updatedOrder = await this.orderService.notifyAsArrived(group_id);
       res.status(200).json({
         status: STATUS.SUCCESS,
         data: updatedOrder,

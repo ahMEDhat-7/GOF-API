@@ -260,6 +260,10 @@ const Order = sequelize.define(
       type: DataTypes.UUID,
       allowNull: false,
     },
+    group_id: {
+      type: DataTypes.UUID,
+      allowNull: false,
+    },
     menu_item_id: {
       type: DataTypes.UUID,
       allowNull: false,
@@ -360,7 +364,15 @@ User.hasMany(Order, {
   onDelete: "CASCADE",
   onUpdate: "CASCADE",
 });
+
 Order.belongsTo(User, { foreignKey: "user_id" });
+
+Group.hasMany(Order, {
+  foreignKey: "group_id",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
+Order.belongsTo(Group, { foreignKey: "group_id" });
 
 export {
   sequelize,

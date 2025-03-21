@@ -1,5 +1,5 @@
-import { Menu, Order } from "../models/Schema.js";
-import { fn, col, Op } from "sequelize";
+import { GroupMember, Menu, Order, User } from "../models/Schema.js";
+import { fn, col, Op, literal } from "sequelize";
 import { CustomError } from "../utils/customError.js";
 import STATUS from "../utils/STATUS.js";
 
@@ -85,49 +85,33 @@ export class OrderService {
     }
   }
 
-  async find(orderData) {
+  async find(user_id) {
     try {
-      const { ordered_by_company, ordered_by_group_name } = orderData;
-
       let orders = await Order.findAll({
         where: {
-          ordered_by_company,
-          ordered_by_group_name,
+          user_id,
           order_status: {
             [Op.notIn]: ["completed", "cancelled"],
           },
         },
-        attributes: [
-          "ordered_by_username",
-          [fn("sum", col("quantity")), "total_quantity"],
-          "item_name",
-          "option",
-          "note",
+        include: [
+          {
+            model: Menu,
+            required: true,
+            attributes: ["item_name"],
+          },
         ],
-        group: ["ordered_by_username", "item_name", "option", "note"],
-        order: [[fn("sum", col("quantity")), "DESC"]],
+        attributes: ["options", "note", "quantity"],
       });
-      const enrichedOrders = await Promise.all(
-        orders.map(async (order) => {
-          const plainOrder = order.get({ plain: true });
 
-          const menuItem = await Menu.findOne({
-            where: { item_name: plainOrder.item_name },
-          });
+      const flattenedOrders = orders.map((order) => ({
+        item_name: order.Menu?.item_name,
+        options: order.options,
+        note: order.note,
+        quantity: order.quantity,
+      }));
 
-          if (menuItem) {
-            const matchedOption = menuItem.options.find(
-              (opt) => opt.option === plainOrder.option
-            );
-
-            plainOrder.price = matchedOption ? matchedOption.price : 0;
-          }
-
-          return plainOrder;
-        })
-      );
-
-      return enrichedOrders;
+      return flattenedOrders;
     } catch (error) {
       throw new Error(error.message, 400, STATUS.ERROR);
     }
@@ -168,48 +152,34 @@ export class OrderService {
     }
   }
 
-  async findTotal(orderData) {
+  async findTotal(group_id) {
     try {
-      const { ordered_by_group_name, ordered_by_company } = orderData;
       const orders = await Order.findAll({
-        attributes: [
-          [fn("sum", col("quantity")), "Tot"],
-          "item_name",
-          "option",
-          "note",
+        include: [
+          {
+            model: Menu,
+            required: true,
+            attributes: [],
+          },
         ],
+        attributes: [
+          [col("Menu.item_name"), "item_name"],
+          [col("Order.options"), "options"],
+          [col("Order.note"), "note"],
+          [fn("sum", col("Order.quantity")), "total_quantity"],
+        ],
+
+        group: ["Menu.item_name", "options", "note"],
+        order: [[fn("sum", col("quantity")), "DESC"]],
         where: {
-          ordered_by_company,
-          ordered_by_group_name,
+          group_id,
           order_status: {
             [Op.notIn]: ["completed", "cancelled"],
           },
         },
-        group: ["item_name", "option", "note", "ordered_by_group_name"],
-        order: [[fn("sum", col("quantity")), "DESC"]],
       });
 
-      const enrichedOrders = await Promise.all(
-        orders.map(async (order) => {
-          const plainOrder = order.get({ plain: true });
-
-          const menuItem = await Menu.findOne({
-            where: { item_name: plainOrder.item_name },
-          });
-
-          if (menuItem) {
-            const matchedOption = menuItem.options.find(
-              (opt) => opt.option === plainOrder.option
-            );
-
-            plainOrder.price = matchedOption ? matchedOption.price : 0;
-          }
-
-          return plainOrder;
-        })
-      );
-
-      return enrichedOrders;
+      return orders;
     } catch (error) {
       throw new CustomError(error.message, 400, STATUS.ERROR);
     }
@@ -255,15 +225,13 @@ export class OrderService {
     }
   }
 
-  async notifyAsArrived(orderData) {
+  async notifyAsArrived(user_id) {
     try {
-      const { ordered_by_group_name, ordered_by_company } = orderData;
       const [updated] = await Order.update(
         { order_status: "arrived" },
         {
           where: {
-            ordered_by_group_name,
-            ordered_by_company,
+            group_id,
           },
         }
       );

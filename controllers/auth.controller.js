@@ -17,7 +17,7 @@ export class AuthController {
       );
 
       const user = await this.authService.register(userDto);
-
+      
       return res.status(201).json(user);
     } catch (error) {
       return next(error);
